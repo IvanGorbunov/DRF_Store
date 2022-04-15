@@ -21,6 +21,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return super().create(validated_data)
 
+    @transaction.atomic()
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+
 
 class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
