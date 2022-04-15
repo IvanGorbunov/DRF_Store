@@ -3,7 +3,7 @@ from django.db import models
 from store.utils import DateModelMixin
 
 
-class Product(models.Model):
+class Product(DateModelMixin):
     """
     Модель: Номенклатура
     """
