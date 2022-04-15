@@ -21,6 +21,20 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return super().create(validated_data)
 
+
+class ProductUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            # 'title',
+            'cost_price',
+            'price',
+            'amount',
+            # 'create_dt',
+            # 'change_dt',
+        )
+
     @transaction.atomic()
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)

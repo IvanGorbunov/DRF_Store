@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from store.models import Product
-from store.serializers import ProductListSerializer, ProductDetailSerializer
+from store.serializers import ProductListSerializer, ProductDetailSerializer, ProductUpdateSerializer
 from store.utils import MultiSerializerViewSet
 
 
@@ -12,8 +12,8 @@ class ProductViewSet(MultiSerializerViewSet):
         'list': ProductListSerializer,
         'create': ProductDetailSerializer,
         'retrieve': ProductDetailSerializer,
-        'update': ProductDetailSerializer,
-        'partial_update': ProductDetailSerializer,
+        'update': ProductUpdateSerializer,
+        'partial_update': ProductUpdateSerializer,
     }
 
     def list(self, request, *args, **kwargs):

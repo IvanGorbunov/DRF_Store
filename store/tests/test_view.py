@@ -44,16 +44,15 @@ class ProductViewTest(APITestCase):
     def test_edit(self):
         url = reverse_lazy('store:manage', kwargs=dict(pk=self.product.pk))
         data = {
-            'title': 'Новое название',
             'cost_price': 20,
             'price': 200,
             'amount': 222,
         }
         response = self.client.put(url, data=json.dumps(data), content_type="application/json")
         self.assertEqual(response.status_code, 200, response.data)
-        product = Product.objects.filter(pk=response.data['id']).first()  # type: Product
+        product = Product.objects.filter(pk=response.data['id']).values('cost_price', 'price', 'amount')[0]
         for check_field in data.keys():
-            self.assertEqual(getattr(product, check_field), data[check_field])
+            self.assertEqual(product[check_field], data[check_field])
 
     def test_delete(self):
         url = reverse_lazy('store:manage', kwargs=dict(pk=self.product.pk))
