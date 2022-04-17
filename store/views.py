@@ -1,8 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
 
-from store.models import Product
-from store.serializers import ProductListSerializer, ProductDetailSerializer, ProductUpdateSerializer
+from store.models import Product, Order
+from store.products_in_stock import check_rest_products
+from store.serializers import ProductListSerializer, ProductDetailSerializer, ProductUpdateSerializer, \
+    OrderListSerializer, OrderDetailSerializer
 from store.utils import MultiSerializerViewSet
 
 
@@ -53,3 +55,27 @@ class ProductViewSet(MultiSerializerViewSet):
         product = self.get_object()
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class OrderViewSet(MultiSerializerViewSet):
+    queryset = Order.objects.all()
+    serializers = {
+        'list': OrderListSerializer,
+        'create': OrderDetailSerializer,
+    }
+
+    def list(self, request, *args, **kwargs):
+        """
+        Список заказов
+        """
+        return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Создание заказа
+        """
+        # Контроль остатков на складе
+        context = check_rest_products(request.data['products'])
+        if not context['enough_products']:
+            return Response(context, status=status.HTTP_204_NO_CONTENT)
+        return super().create(request, *args, **kwargs)

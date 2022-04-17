@@ -3,8 +3,8 @@ import json
 from rest_framework.reverse import reverse_lazy
 from rest_framework.test import APITestCase
 
-from store.models import Product
-from store.tests.factories import ProductFactory
+from store.models import Product, Order
+from store.tests.factories import ProductFactory, OrderFactory
 
 
 class ProductViewTest(APITestCase):
@@ -13,13 +13,13 @@ class ProductViewTest(APITestCase):
         self.product = ProductFactory()
 
     def test_list(self):
-        url = reverse_lazy('store:list')
+        url = reverse_lazy('store:product_list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(len(response.data), Product.objects.all().count(), response.data)
 
     def test_create(self):
-        url = reverse_lazy('store:list')
+        url = reverse_lazy('store:product_list')
         data = {
             'title': 'Название',
             'cost_price': 10,
@@ -36,13 +36,13 @@ class ProductViewTest(APITestCase):
         self.assertEqual(response.data['amount'], product.amount)
 
     def test_retrieve(self):
-        url = reverse_lazy('store:manage', kwargs=dict(pk=self.product.pk))
+        url = reverse_lazy('store:product_manage', kwargs=dict(pk=self.product.pk))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['id'], self.product.pk, response.data)
 
     def test_edit(self):
-        url = reverse_lazy('store:manage', kwargs=dict(pk=self.product.pk))
+        url = reverse_lazy('store:product_manage', kwargs=dict(pk=self.product.pk))
         data = {
             'cost_price': 20,
             'price': 200,
@@ -55,8 +55,72 @@ class ProductViewTest(APITestCase):
             self.assertEqual(product[check_field], data[check_field])
 
     def test_delete(self):
-        url = reverse_lazy('store:manage', kwargs=dict(pk=self.product.pk))
+        url = reverse_lazy('store:product_manage', kwargs=dict(pk=self.product.pk))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204, response.data)
         product = Product.objects.filter(pk=self.product.pk)  # type: Product
         self.assertIsNone(product.first())
+
+
+class OrderViewTest(APITestCase):
+
+    def setUp(self) -> None:
+        self.product_1 = ProductFactory(title='P_1', amount=10)
+        self.product_2 = ProductFactory(title='P_2', amount=10)
+        self.product_3 = ProductFactory(title='P_3', amount=10)
+
+    def test_list(self):
+        OrderFactory()
+        url = reverse_lazy('store:orders_list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(len(response.data), Order.objects.all().count(), response.data)
+
+    def test_create(self):
+        url = reverse_lazy('store:orders_list')
+
+        # Продажа 1
+        data = {
+            'status': 'ordered',
+            'products': [
+                {
+                    'product': 1,
+                    'quantity': 10,
+                    'price': 150
+                },
+                {
+                    'product': 2,
+                    'quantity': 5,
+                    'price': 350
+                }
+            ]
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type="application/json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(Order.objects.filter(pk=response.data['id']).count(), 1, response.data)
+
+        # Продажа 2
+        url = reverse_lazy('store:orders_list')
+        data = {
+            'status': 'ordered',
+            'products': [
+                {
+                    'product': 1,
+                    'quantity': 1,
+                    'price': 150
+                },
+                {
+                    'product': 2,
+                    'quantity': 5,
+                    'price': 350
+                },
+                {
+                    'product': 3,
+                    'quantity': 5,
+                    'price': 450
+                }
+            ]
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type="application/json")
+        self.assertEqual(response.status_code, 204, response.data)
+        self.assertEqual(response.data['enough_products'], False, response.data)

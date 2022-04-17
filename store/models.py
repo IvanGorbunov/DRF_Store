@@ -31,6 +31,38 @@ class Order(DateModelMixin):
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
+    def __str__(self):
+        return f'Заказ: {self.pk}'
+
+    def destroy(self):
+        """
+        Удаление заказа
+        """
+        # Удалить все заказанные продукты
+        self.products.all().delete()
+
+    def save_products(self, products):
+        ids = []
+        if products is None:
+            return
+
+        for product in products:
+            product_id = product['product'].id
+            instance, _ = OrderItem.objects.update_or_create(
+                order=self,
+                product=product['product'],
+                quantity=product['quantity'],
+                price=product['price'],
+            )
+            ids.append(instance.id)
+            # TODO: реализовать расчет себестоимости
+            # уменьшим на количество купленного
+            amount = Product.objects.filter(pk=product_id).values('amount')[0]['amount']
+            amount -= product['quantity']
+            Product.objects.filter(pk=product_id).update(amount=amount)
+
+        OrderItem.objects.filter(order=self).exclude(pk__in=ids).delete()
+
 
 class OrderItem(models.Model):
     """

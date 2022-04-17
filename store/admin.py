@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, TabularInline
 
-from django.utils.translation import gettext_lazy as _
-
 from store.models import Product, Order, OrderItem
 
 
@@ -37,7 +35,7 @@ class ProductAdmin(ModelAdmin):
     )
 
 
-class ApprovalsInline(TabularInline):
+class OrderItemAInline(TabularInline):
     raw_id_fields = ('product', )
     model = OrderItem
     extra = 0
@@ -47,7 +45,7 @@ class ApprovalsInline(TabularInline):
 @admin.register(Order)
 class OrderAdmin(ModelAdmin):
     inlines = (
-        ApprovalsInline,
+        OrderItemAInline,
     )
 
     verbose_name_plural = 'Заказ'
