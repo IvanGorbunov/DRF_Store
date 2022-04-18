@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/', views.ProductViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='product_manage'),
 
     path('orders/', views.OrderViewSet.as_view({'get': 'list', 'post': 'create'}), name='orders_list'),
+    path('orders/<int:pk>/', views.OrderViewSet.as_view({'get': 'retrieve', 'delete': 'destroy'}), name='order_manage'),
 ]

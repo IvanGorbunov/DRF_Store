@@ -1,10 +1,11 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 
-from store.models import Product, Order
-from store.products_in_stock import check_rest_products
+from store.models import Product, Order, OrderItem
+from store.products_in_stock import check_rest_products, return_of_products
 from store.serializers import ProductListSerializer, ProductDetailSerializer, ProductUpdateSerializer, \
-    OrderListSerializer, OrderDetailSerializer
+    OrderListSerializer, OrderDetailSerializer, OrderItemEditSerializer
 from store.utils import MultiSerializerViewSet
 
 
@@ -62,6 +63,8 @@ class OrderViewSet(MultiSerializerViewSet):
     serializers = {
         'list': OrderListSerializer,
         'create': OrderDetailSerializer,
+        'retrieve': OrderDetailSerializer,
+        'destroy': OrderDetailSerializer,
     }
 
     def list(self, request, *args, **kwargs):
@@ -79,3 +82,30 @@ class OrderViewSet(MultiSerializerViewSet):
         if not context['enough_products']:
             return Response(context, status=status.HTTP_204_NO_CONTENT)
         return super().create(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Просмотр заказа
+        """
+        order = self.get_object()  # type: Order
+        serializer = OrderDetailSerializer(order)
+        context = dict(serializer.data)
+        products = OrderItem.objects.filter(order=order).all()
+        serializer = OrderItemEditSerializer(products, many=True)
+        context['products'] = []
+        if products:
+            context['products'] = [dict(item) for item in serializer.data]
+        return Response(context, status=status.HTTP_200_OK)
+
+    @transaction.atomic()
+    def destroy(self, request, *args, **kwargs):
+        """
+        Удаление заказа
+        """
+        order = self.get_object()  # type: Order
+        order.destroy()
+        # возврат товаров на склад
+        products = OrderItem.objects.filter(order=order).all()
+        serializer = OrderItemEditSerializer(products, many=True)
+        return_of_products([dict(item) for item in serializer.data])
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -3,6 +3,7 @@ import json
 from rest_framework.reverse import reverse_lazy
 from rest_framework.test import APITestCase
 
+from store.choices import Status
 from store.models import Product, Order
 from store.tests.factories import ProductFactory, OrderFactory
 
@@ -124,3 +125,18 @@ class OrderViewTest(APITestCase):
         response = self.client.post(url, data=json.dumps(data), content_type="application/json")
         self.assertEqual(response.status_code, 204, response.data)
         self.assertEqual(response.data['enough_products'], False, response.data)
+
+    def test_retrieve(self):
+        order = OrderFactory(status=Status.ORDERED)
+        url = reverse_lazy('store:order_manage', kwargs=dict(pk=order.pk))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['id'], order.pk, response.data)
+
+    def test_destroy(self):
+        order = OrderFactory(status=Status.ORDERED)
+        url = reverse_lazy('store:order_manage', kwargs=dict(pk=order.pk))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204, response.data)
+        order = Order.objects.filter(pk=order.pk).first()
+        self.assertEqual(order.status, Status.CANSELED, response.data)

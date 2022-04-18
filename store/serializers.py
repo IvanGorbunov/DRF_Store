@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from store.models import Product, Order, OrderItem
+from store.products_in_stock import write_off_of_products
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -94,5 +95,5 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         products = validated_data.pop('products', None)
         order = super().create(validated_data)  # type: Order
-        order.save_products(products)
+        write_off_of_products(order, products)
         return order
