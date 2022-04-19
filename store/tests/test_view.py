@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 
 from store.choices import Status
 from store.models import Product, Order
-from store.tests.factories import ProductFactory, OrderFactory
+from store.tests.factories import ProductFactory, OrderFactory, OrderItemFactory
 
 
 class ProductViewTest(APITestCase):
@@ -139,4 +139,31 @@ class OrderViewTest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204, response.data)
         order = Order.objects.filter(pk=order.pk).first()
-        self.assertEqual(order.status, Status.CANSELED, response.data)
+        self.assertEqual(order.status, Status.CANCELED, response.data)
+
+
+class ReportViewTest(APITestCase):
+
+    def setUp(self) -> None:
+        self.product_1 = ProductFactory(title='P_1', cost_price=100, price=150, amount=10)  # type: Product
+        self.product_2 = ProductFactory(title='P_2', cost_price=100, price=150, amount=10)  # type: Product
+        self.product_3 = ProductFactory(title='P_3', cost_price=100, price=150, amount=10)  # type: Product
+
+    def test_list(self):
+        order_1 = OrderFactory(status=Status.ORDERED)  # type: Order
+        row_11 = OrderItemFactory(order=order_1, product=self.product_1, quantity=3, price=self.product_1.price)  # type: OrderItem
+        row_12 = OrderItemFactory(order=order_1, product=self.product_2, quantity=3, price=self.product_2.price)  # type: OrderItem
+
+        order_2 = OrderFactory(status=Status.CANCELED)  # type: Order
+        row_11 = OrderItemFactory(order=order_2, product=self.product_1, quantity=3, price=self.product_1.price)  # type: OrderItem
+        row_12 = OrderItemFactory(order=order_2, product=self.product_3, quantity=3, price=self.product_3.price)  # type: OrderItem
+
+        url = reverse_lazy('store:report')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200, response.data)
+        products = response.data['products']
+        self.assertEqual(products[0]['sale_item'], 3, response.data)
+        self.assertEqual(products[0]['returns'], 3, response.data)
+        self.assertEqual(products[2]['sale_item'], 0, response.data)
+        self.assertEqual(products[2]['returns'], 3, response.data)
+

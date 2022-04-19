@@ -1,4 +1,8 @@
+from django.db.models import F
+
+from store.choices import Status
 from store.models import Product, OrderItem
+from store.utils import find_by_key
 
 
 def check_rest_products(products):
@@ -66,3 +70,52 @@ def return_of_products(products):
         amount = Product.objects.filter(pk=product_id).values('amount')[0]['amount']
         amount += product['quantity']
         Product.objects.filter(pk=product_id).update(amount=amount)
+
+
+def get_report(queryset):
+    products = []
+    # заказнные продукты
+    ordered_orders = queryset.filter(status=Status.ORDERED).all()
+    ordered_products = OrderItem.objects.filter(order__in=ordered_orders)
+    ordered_products = ordered_products.annotate(product_title=F('product__title'))
+    ordered_products = ordered_products.annotate(cost_price=F('product__cost_price')).all()
+    if ordered_products:
+        for item in ordered_products:
+            revenue = item.quantity * item.price
+            found_row = find_by_key(products, 'product_id', item.product.id)
+            if found_row:
+                found_row[1]['revenue'] += revenue
+                found_row[1]['profit'] += revenue - item.cost_price * item.quantity
+                found_row[1]['sale_item'] += item.quantity
+            else:
+                row = {
+                    'product_id': item.product.id,
+                    'product': item.product_title,
+                    'revenue': revenue,
+                    'profit': revenue - item.cost_price * item.quantity,
+                    'sale_item': item.quantity,
+                    'returns': 0,
+                }
+                products.append(row)
+
+    # отмененные продукты
+    canceled_orders = queryset.filter(status=Status.CANCELED).all()
+    canceled_products = OrderItem.objects.filter(order__in=canceled_orders)
+    canceled_products = canceled_products.annotate(product_title=F('product__title')).all()
+    if canceled_products:
+        for item in canceled_products:
+            found_row = find_by_key(products, 'product_id', item.product.id)
+            if found_row:
+                found_row[1]['returns'] += item.quantity
+            else:
+                row = {
+                    'product_id': item.product.id,
+                    'product': item.product_title,
+                    'revenue': 0,
+                    'profit': 0,
+                    'sale_item': 0,
+                    'returns': item.quantity,
+                }
+                products.append(row)
+
+    return products

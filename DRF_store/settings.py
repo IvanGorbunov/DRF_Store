@@ -33,7 +33,7 @@ SECRET_KEY = env.str('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', False)
-
+SQL_DEBUG = env.bool('SQL_DEBUG', False)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 
@@ -60,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if SQL_DEBUG:
+    MIDDLEWARE = MIDDLEWARE + ['DRF_store.utils.DebugQuerysetsWare']
 
 ROOT_URLCONF = 'DRF_store.urls'
 

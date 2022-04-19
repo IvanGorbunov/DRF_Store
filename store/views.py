@@ -2,8 +2,9 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 
+from store.filters import ReportFilter
 from store.models import Product, Order, OrderItem
-from store.products_in_stock import check_rest_products, return_of_products
+from store.products_in_stock import check_rest_products, return_of_products, get_report
 from store.serializers import ProductListSerializer, ProductDetailSerializer, ProductUpdateSerializer, \
     OrderListSerializer, OrderDetailSerializer, OrderItemEditSerializer
 from store.utils import MultiSerializerViewSet
@@ -109,3 +110,26 @@ class OrderViewSet(MultiSerializerViewSet):
         serializer = OrderItemEditSerializer(products, many=True)
         return_of_products([dict(item) for item in serializer.data])
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReportViewSet(MultiSerializerViewSet):
+    queryset = Order.objects.all()
+    filtersets = {
+        'list': ReportFilter,
+    }
+    serializers = {
+        'list': OrderDetailSerializer,
+    }
+
+    def list(self, request, *args, **kwargs):
+        """
+        Просмотр отчета
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        products = get_report(queryset)
+
+        context = {
+            'products': products,
+        }
+
+        return Response(context, status=status.HTTP_200_OK)

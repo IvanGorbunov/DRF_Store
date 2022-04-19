@@ -16,6 +16,12 @@ def generate_uniq_code():
     return str(tz_now().timestamp()).replace('.', '')
 
 
+def find_by_key(iterable, key, value):
+    for index, dict_ in enumerate(iterable):
+        if key in dict_ and dict_[key] == value:
+            return index, dict_
+
+
 class CreateModelMixin(models.Model):
     create_dt = models.DateTimeField('Создание записи', auto_now_add=True)
 

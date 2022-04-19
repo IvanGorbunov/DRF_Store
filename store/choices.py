@@ -1,13 +1,13 @@
 class Status:
     ORDERED = 'ordered'
-    CANSELED = 'canseled'
+    CANCELED = 'canceled'
 
     ITEMS = [
         ORDERED,
-        CANSELED,
+        CANCELED,
     ]
 
     CHOICES = (
         (ORDERED, 'Заказано'),
-        (CANSELED, 'Отменено'),
+        (CANCELED, 'Отменено'),
     )

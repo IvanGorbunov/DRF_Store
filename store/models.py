@@ -38,7 +38,7 @@ class Order(DateModelMixin):
         """
         Отмена заказа
         """
-        self.status = Status.CANSELED
+        self.status = Status.CANCELED
         self.save()
 
 
