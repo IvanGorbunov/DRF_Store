@@ -90,3 +90,10 @@
    http://127.0.0.1:8000/api/store/orders/<int:pk>/ - просмотр/редактирование заказа
    http://127.0.0.1:8000/api/store/report/ - отчет по продажам
    ```
+9. Запуск контейнера:
+   ```bash
+   docker-compose up -d --build
+   docker-compose run --rm web sh -c "python3 manage.py migrate"
+   docker-compose run --rm web sh -c "python3 manage.py createsuperuser"
+   docker-compose run --rm --service-ports web sh -c "python3 manage.py runserver 0.0.0.0:8000" 
+   ```
