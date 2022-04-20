@@ -82,3 +82,11 @@
     ```bash
     python3 manage.py runserver
     ```
+8. Список эндпоинтов:
+   ```angular2html
+   http://127.0.0.1:8000/api/store/ - список товаров (GET, POST)
+   http://127.0.0.1:8000/api/store/<int:pk>/ - просмотр/редактирование товара
+   http://127.0.0.1:8000/api/store/orders/ - список заказов (GET, POST)
+   http://127.0.0.1:8000/api/store/orders/<int:pk>/ - просмотр/редактирование заказа
+   http://127.0.0.1:8000/api/store/report/ - отчет по продажам
+   ```
