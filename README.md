@@ -75,7 +75,6 @@
     ```
 6. Выполнить миграции:
     ```bash
-    python3 manage.py makemigrations
     python3 manage.py migrate
     ```
 7. Запустить сервер:
@@ -93,7 +92,4 @@
 9. Запуск контейнера:
    ```bash
    docker-compose up -d --build
-   docker-compose run --rm web sh -c "python3 manage.py migrate"
-   docker-compose run --rm web sh -c "python3 manage.py createsuperuser"
-   docker-compose run --rm --service-ports web sh -c "python3 manage.py runserver 0.0.0.0:8000" 
    ```
