@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+
+  db:
+    image: mysql
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=db.sqlite3
+    container_name: DRF_store_mysql
+
+  web:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - 8000:8000
+    image: app:django
+    container_name: DRF_store
+    command: python3 manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
