@@ -46,7 +46,7 @@ class OrderItem(models.Model):
     """
     Модель: Заказанный товар
     """
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(Order, related_name='products', on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField("Количество", blank=True, default=0)
     price = models.FloatField("Цена", blank=True, default=0)

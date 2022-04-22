@@ -91,11 +91,6 @@ class OrderViewSet(MultiSerializerViewSet):
         order = self.get_object()  # type: Order
         serializer = OrderDetailSerializer(order)
         context = dict(serializer.data)
-        products = OrderItem.objects.filter(order=order).all()
-        serializer = OrderItemEditSerializer(products, many=True)
-        context['products'] = []
-        if products:
-            context['products'] = [dict(item) for item in serializer.data]
         return Response(context, status=status.HTTP_200_OK)
 
     @transaction.atomic()
