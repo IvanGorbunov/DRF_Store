@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .yasg import urlpatterns as doc_url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('DRF_store.urls_api')),
-]
+] + doc_url
