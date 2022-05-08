@@ -58,25 +58,14 @@
 2. Создать и заполнить файл`.env` по шаблону `/DRF_store/.env.template`. Файл`.env` дожен находится в одной директории с `settings.py`.
 
    Переменные для заполнения:
-   
-   - для запуска локально:
       ```
       DEBUG=on
       SQL_DEBUG=on
       SECRET_KEY=XXXXXX
-      DATABASE_URL=psql://drf_store:drf_store@127.0.0.1:5432/drf_store
+      DATABASE_URL=sqlite:///db.sqlite3
       DJANGO_ALLOWED_HOSTS=*
       ```
-      
-   - для запуска в контейнере `Docker`:
-      ```
-      DEBUG=on
-      SQL_DEBUG=on
-      SECRET_KEY=XXXXXX
-      DATABASE_URL=psql://postgres:postgres@db:5432/postgres
-      DJANGO_ALLOWED_HOSTS=*
-      ```
-
+ 
 3. Установить витуальное окружение для проекта `venv` в директории проекта:
     ```bash
     python3 -m venv venv
