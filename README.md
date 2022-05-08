@@ -55,7 +55,28 @@
    ```bash
    git clone https://github.com/IvanGorbunov/DRF_Store.git
    ```
-2. Создать и заполнить файл`.env` по шаблону `/DRF_store/.env.template`. Файл`.env` дожен находится в одной директории с `settings.py`
+2. Создать и заполнить файл`.env` по шаблону `/DRF_store/.env.template`. Файл`.env` дожен находится в одной директории с `settings.py`.
+
+   Переменные для заполнения:
+   
+   - для запуска локально:
+      ```
+      DEBUG=on
+      SQL_DEBUG=on
+      SECRET_KEY=XXXXXX
+      DATABASE_URL=psql://drf_store:drf_store@127.0.0.1:5432/drf_store
+      DJANGO_ALLOWED_HOSTS=*
+      ```
+      
+   - для запуска в контейнере `Docker`:
+      ```
+      DEBUG=on
+      SQL_DEBUG=on
+      SECRET_KEY=XXXXXX
+      DATABASE_URL=psql://postgres:postgres@db:5432/postgres
+      DJANGO_ALLOWED_HOSTS=*
+      ```
+
 3. Установить витуальное окружение для проекта `venv` в директории проекта:
     ```bash
     python3 -m venv venv
@@ -92,5 +113,12 @@
    ```
 9. Запуск контейнера:
    ```bash
-   docker-compose up -d --build
-   ```
+    mkdir -p ./Data/db/
+    docker-compose up -d --build
+    docker-compose run --rm web sh -c "python3 manage.py migrate"
+    docker-compose run --rm web sh -c "python3 manage.py createsuperuser"
+    ```
+10. Запуск тестов в контейнере:
+    ```bash
+    docker-compose run --rm web ./manage.py test
+    ```
