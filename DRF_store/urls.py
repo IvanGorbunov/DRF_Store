@@ -19,5 +19,6 @@ from .yasg import urlpatterns as doc_url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('store.urls')),
     path('api/', include('DRF_store.urls_api')),
 ] + doc_url

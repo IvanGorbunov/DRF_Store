@@ -1,0 +1,29 @@
+<h1>Orders</h1>
+<ul>
+
+<table class="" style="border:1px solid black;border-collapse:collapse;">
+<thead>
+  <tr>
+    <th class="" style="border:1px solid black;">ID</th>
+    <th class="" style="border:1px solid black;">STATUS</th>
+    <th class="" style="border:1px solid black;">CREATE DATE</th>
+  </tr>
+</thead>
+<tbody>
+    {% for order in object_list %}
+        <tr>
+            <td class="" style="border:1px solid black;">{{ order.id|safe }}</td>
+            <td class="" style="border:1px solid black;">{{ order.status|safe }}</td>
+            <td class="" style="border:1px solid black;">{{ order.create_dt|safe }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td class="" style="border:1px solid black;"></td>
+            <td class="" style="border:1px solid black;"></td>
+            <td class="" style="border:1px solid black;"></td>
+        </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+</ul>

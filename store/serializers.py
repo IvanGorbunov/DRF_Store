@@ -79,6 +79,8 @@ class OrderItemEditSerializer(serializers.ModelSerializer):
 
 class OrderDetailSerializer(serializers.ModelSerializer):
     products = OrderItemEditSerializer(many=True, required=False, write_only=True)
+    create_dt = serializers.DateTimeField(format='%H:%M:%S %d.%m.%Y')
+    change_dt = serializers.DateTimeField(format='%H:%M:%S %d.%m.%Y')
 
     class Meta:
         model = Order

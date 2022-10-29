@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.views.generic import ListView
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -128,3 +129,18 @@ class ReportViewSet(MultiSerializerViewSet):
         }
 
         return Response(context, status=status.HTTP_200_OK)
+
+
+class OrderListView(ListView):
+    model = Order
+    paginate_by = 100
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        new_context = {
+            'object_list': [],
+        }
+        for order in context['object_list']:    # type Order
+            serializer = OrderDetailSerializer(order)
+            new_context['object_list'].append(serializer.data)
+        return new_context
