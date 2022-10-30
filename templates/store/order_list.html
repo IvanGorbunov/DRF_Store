@@ -1,12 +1,24 @@
-<h1>Orders</h1>
-<ul>
+{% load static %}
 
-<table class="" style="border:1px solid black;border-collapse:collapse;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+
+<h1>Orders</h1>
+
+
+<table class="table">
 <thead>
   <tr>
-    <th class="" style="border:1px solid black;">ID</th>
-    <th class="" style="border:1px solid black;">STATUS</th>
-    <th class="" style="border:1px solid black;">CREATE DATE</th>
+    <th class="td">ID</th>
+    <th class="td">STATUS</th>
+    <th class="td">CREATE DATE</th>
   </tr>
 </thead>
 <tbody>
@@ -26,4 +38,6 @@
 </tbody>
 </table>
 
-</ul>
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
