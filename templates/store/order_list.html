@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Orders</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 </head>
@@ -13,31 +15,37 @@
 <h1>Orders</h1>
 
 
-<table class="table">
+<table class="table" id="table_id">
 <thead>
-  <tr>
-    <th class="td">ID</th>
-    <th class="td">STATUS</th>
-    <th class="td">CREATE DATE</th>
-  </tr>
+    <tr>
+        <th class="td"></th>
+        <th class="td">ID</th>
+        <th class="td">STATUS</th>
+        <th class="td">CREATE DATE</th>
+    </tr>
 </thead>
 <tbody>
     {% for order in object_list %}
         <tr>
-            <td class="" style="border:1px solid black;">{{ order.id|safe }}</td>
-            <td class="" style="border:1px solid black;">{{ order.status|safe }}</td>
-            <td class="" style="border:1px solid black;">{{ order.create_dt|safe }}</td>
+            <td class="td" data-url="{% url 'store_view:order-products' order.id|safe %}">+</td>
+{#            <td class="td" data-url="{{ order.get_absolute_url|safe }}">+</td>#}
+            <td class="td">{{ order.id|safe }}</td>
+            <td class="td">{{ order.status|safe }}</td>
+            <td class="td">{{ order.create_dt|safe }}</td>
         </tr>
     {% empty %}
         <tr>
-            <td class="" style="border:1px solid black;"></td>
-            <td class="" style="border:1px solid black;"></td>
-            <td class="" style="border:1px solid black;"></td>
+            <td class="td"></td>
+            <td class="td"></td>
+            <td class="td"></td>
+            <td class="td"></td>
         </tr>
     {% endfor %}
 </tbody>
 </table>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
 <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

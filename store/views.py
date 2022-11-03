@@ -144,3 +144,19 @@ class OrderListView(ListView):
             serializer = OrderDetailSerializer(order)
             new_context['object_list'].append(serializer.data)
         return new_context
+
+
+class OrderProductsListView(ListView):
+    model = OrderItem
+    paginate_by = 100
+
+    def get_context_data(self, **kwargs):
+        # queryset = OrderItem.objects.filter(order=)
+        context = super().get_context_data(**kwargs)
+        new_context = {
+            'object_list': [],
+        }
+        # for order in context['object_list']:    # type Order
+        #     serializer = OrderDetailSerializer(order)
+        #     new_context['object_list'].append(serializer.data)
+        return new_context
