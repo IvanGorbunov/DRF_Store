@@ -63,6 +63,23 @@ class OrderListSerializer(serializers.ModelSerializer):
         )
 
 
+class OrderItemListSerializer(serializers.ModelSerializer):
+    product = ProductDetailSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = (
+            'id',
+            'order',
+            'product',
+            'quantity',
+            'price',
+            'amount',
+
+            # 'product_title',
+        )
+
+
 class OrderItemEditSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
 
@@ -78,7 +95,6 @@ class OrderItemEditSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
-    products = OrderItemEditSerializer(many=True, required=False, write_only=True)
     create_dt = serializers.DateTimeField(format='%H:%M:%S %d.%m.%Y')
     change_dt = serializers.DateTimeField(format='%H:%M:%S %d.%m.%Y')
 
@@ -89,8 +105,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'status',
             'create_dt',
             'change_dt',
-
-            'products',
         )
 
     @transaction.atomic()

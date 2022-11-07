@@ -1,4 +1,6 @@
 from django.db import transaction
+from django.db.models import Sum
+from django.views import View
 from django.views.generic import ListView
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,7 +9,7 @@ from store.filters import ReportFilter
 from store.models import Product, Order, OrderItem
 from store.products_in_stock import check_rest_products, return_of_products, get_report
 from store.serializers import ProductListSerializer, ProductDetailSerializer, ProductUpdateSerializer, \
-    OrderListSerializer, OrderDetailSerializer, OrderItemEditSerializer
+    OrderListSerializer, OrderDetailSerializer, OrderItemEditSerializer, OrderItemListSerializer
 from store.utils import MultiSerializerViewSet
 
 
@@ -92,6 +94,11 @@ class OrderViewSet(MultiSerializerViewSet):
         order = self.get_object()  # type: Order
         serializer = OrderDetailSerializer(order)
         context = dict(serializer.data)
+
+        items = OrderItem.objects.filter(order_id=order.id).all()
+        serializer = OrderItemListSerializer(items, many=True)
+        context['items'] = serializer.data
+
         return Response(context, status=status.HTTP_200_OK)
 
     @transaction.atomic()
@@ -142,7 +149,9 @@ class OrderListView(ListView):
         }
         for order in context['object_list']:    # type Order
             serializer = OrderDetailSerializer(order)
-            new_context['object_list'].append(serializer.data)
+            data = dict(serializer.data)
+            data['total_amount'] = OrderItem.objects.filter(order=order).aggregate(total_amount=Sum('amount'))['total_amount']
+            new_context['object_list'].append(data)
         return new_context
 
 
@@ -160,3 +169,12 @@ class OrderProductsListView(ListView):
         #     serializer = OrderDetailSerializer(order)
         #     new_context['object_list'].append(serializer.data)
         return new_context
+
+
+class OrderItemListView(View):
+
+    def get(self, request, pk):
+        products = OrderItem.objects.filter(order_id=pk).all()
+        serializer = OrderItemListSerializer(products, many=True)
+        return {'items': serializer.data}
+

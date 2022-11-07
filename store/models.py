@@ -50,7 +50,15 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField("Количество", blank=True, default=0)
     price = models.FloatField("Цена", blank=True, default=0)
+    amount = models.FloatField("Сумма", blank=True, default=0)
 
     class Meta:
         verbose_name = 'Заказанный товар'
         verbose_name_plural = 'Заказанные товары'
+        
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        self.amount = self.quantity * self.price
+        return super(OrderItem, self).save()
+        

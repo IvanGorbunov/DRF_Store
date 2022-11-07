@@ -80,6 +80,7 @@ class OrderItemAdmin(ModelAdmin):
         'product',
         'quantity',
         'price',
+        'amount',
     )
     list_per_page = 25
     fieldsets = (
@@ -90,6 +91,7 @@ class OrderItemAdmin(ModelAdmin):
                     'product',
                     'quantity',
                     'price',
+                    'amount',
                 )
             }
         ),
